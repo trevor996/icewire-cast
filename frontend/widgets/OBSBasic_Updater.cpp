@@ -38,7 +38,7 @@
 #endif
 #include <qt-wrappers.hpp>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #define UPDATE_CHECK_INTERVAL (60 * 60 * 24 * 4) /* 4 days */
 #endif
 
