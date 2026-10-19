@@ -1,0 +1,79 @@
+@OBSThemeMeta {
+    name: 'ICEWIRE';
+    id: 'com.icewire.Cast';
+    extends: 'com.obsproject.Yami';
+    author: 'ICEWIRE';
+    dark: 'true';
+}
+
+@OBSThemeVars {
+    --blue1: #79B9FF;
+    --blue2: #4F84B1;
+    --blue3: #2E5D8A;
+    --blue4: #22486D;
+    --blue5: #17334F;
+    --blue6: #102338;
+
+    --red1: #FF5964;
+    --red2: #F02B37;
+    --red3: #E30613;
+    --red4: #B4000B;
+    --red5: #800008;
+    --red6: #520005;
+
+    --grey1: #596A77;
+    --grey2: #46545F;
+    --grey3: #34414B;
+    --grey4: #29343D;
+    --grey5: #222B32;
+    --grey6: #1A1E24;
+    --grey7: #11171C;
+    --grey8: #0B0D10;
+
+    --white1: #F5F7FA;
+    --white2: #E3E8ED;
+    --white3: #C9D1D8;
+    --white4: #9EABB5;
+    --white5: #75838D;
+
+    --bg_window: #0B0D10;
+    --bg_base: #1A1E24;
+    --bg_preview: #05070A;
+
+    --primary: #E30613;
+    --primary_light: #F02B37;
+    --primary_lighter: #FF5964;
+    --primary_dark: #B4000B;
+    --primary_darker: #800008;
+
+    --text: #F5F7FA;
+    --text_light: #FFFFFF;
+    --text_muted: #9EABB5;
+    --border_color: #34414B;
+    --highlight_color: #79B9FF;
+    --input_border_focus: #E30613;
+    --list_item_bg_selected: #2E5D8A;
+    --list_item_bg_hover: #22486D;
+    --palette_link: #79B9FF;
+    --palette_linkVisited: #79B9FF;
+    --scrollbar_handle: #46545F;
+}
+
+QMenuBar {
+    border-bottom: 1px solid #34414B;
+}
+
+QDockWidget::title {
+    border-top: 2px solid #E30613;
+    letter-spacing: 1px;
+}
+
+QPushButton[class~="button-primary"] {
+    background: #B4000B;
+    border-color: #E30613;
+    color: #F5F7FA;
+}
+
+OBSBasic {
+    background-color: #0B0D10;
+}

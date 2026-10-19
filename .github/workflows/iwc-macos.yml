@@ -1,0 +1,103 @@
+name: Build ICEWIRE CAST for macOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: ICEWIRE CAST version (major.minor.patch)
+        required: true
+        default: 1.2.0
+      signed:
+        description: Sign and notarize with the configured Apple Developer credentials
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: macOS ${{ matrix.label }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: arm64
+            label: Apple Silicon
+            artifact: apple
+            runner: macos-15
+          - target: x86_64
+            label: Intel
+            artifact: intel
+            runner: macos-15-intel
+    defaults:
+      run:
+        shell: zsh --no-rcs --errexit --pipefail {0}
+    env:
+      IWC_RELEASE_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Select Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_26.1.app/Contents/Developer
+
+      - name: Configure Apple signing
+        if: ${{ inputs.signed }}
+        id: codesign
+        uses: ./.github/actions/setup-macos-codesigning
+        with:
+          codesignIdentity: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          codesignCertificate: ${{ secrets.MACOS_SIGNING_CERT }}
+          certificatePassword: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
+          keychainPassword: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+          provisioningProfile: ${{ secrets.MACOS_SIGNING_PROVISIONING_PROFILE }}
+          notarizationUser: ${{ secrets.MACOS_NOTARIZATION_USERNAME }}
+          notarizationPassword: ${{ secrets.MACOS_NOTARIZATION_PASSWORD }}
+
+      - name: Build ICEWIRE CAST
+        uses: ./.github/actions/build-obs
+        env:
+          TWITCH_CLIENTID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_HASH: ${{ secrets.TWITCH_HASH }}
+          RESTREAM_CLIENTID: ${{ secrets.RESTREAM_CLIENTID }}
+          RESTREAM_HASH: ${{ secrets.RESTREAM_HASH }}
+          YOUTUBE_CLIENTID: ${{ secrets.YOUTUBE_CLIENTID }}
+          YOUTUBE_CLIENTID_HASH: ${{ secrets.YOUTUBE_CLIENTID_HASH }}
+          YOUTUBE_SECRET: ${{ secrets.YOUTUBE_SECRET }}
+          YOUTUBE_SECRET_HASH: ${{ secrets.YOUTUBE_SECRET_HASH }}
+        with:
+          target: ${{ matrix.target }}
+          config: RelWithDebInfo
+          codesign: ${{ inputs.signed }}
+          codesignIdent: ${{ steps.codesign.outputs.codesignIdent }}
+          codesignTeam: ${{ steps.codesign.outputs.codesignTeam }}
+          provisioningProfileUUID: ${{ steps.codesign.outputs.provisioningProfileUUID }}
+
+      - name: Package ICEWIRE CAST disk image
+        uses: ./.github/actions/package-obs
+        with:
+          target: ${{ matrix.target }}
+          config: RelWithDebInfo
+          package: true
+          codesign: ${{ inputs.signed }}
+          codesignIdent: ${{ steps.codesign.outputs.codesignIdent }}
+          notarize: ${{ inputs.signed }}
+          codesignUser: ${{ secrets.MACOS_NOTARIZATION_USERNAME }}
+          codesignPass: ${{ secrets.MACOS_NOTARIZATION_PASSWORD }}
+
+      - name: Create SHA-256 checksum
+        run: shasum -a 256 build_macos/ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}.dmg > build_macos/ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}.dmg.sha256
+
+      - name: Upload macOS package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}
+          path: |
+            build_macos/ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}.dmg
+            build_macos/ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}.dmg.sha256
+          if-no-files-found: error
