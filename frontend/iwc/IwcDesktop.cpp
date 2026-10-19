@@ -479,7 +479,7 @@ public:
 		outer->addWidget(heading);
 		auto *form = new QFormLayout;
 		team = new QComboBox;
-		for (const auto &entry : teams) {
+		for (const auto entry : teams) {
 			const auto object = entry.toObject();
 			team->addItem(object.value("name").toString(), object.value("id").toString());
 		}
@@ -773,7 +773,7 @@ private:
 		const auto events = workspace.value("events").toArray();
 		gamesTable->setRowCount(0);
 		showsTable->setRowCount(0);
-		for (const auto &entry : events) {
+		for (const auto entry : events) {
 			const auto event = entry.toObject();
 			const bool show = event.value("productionType").toString() == "coaches_show";
 			auto *eventTable = show ? showsTable : gamesTable;
@@ -1125,7 +1125,7 @@ private:
 			feedback->setText("Keep this window open. A camera appears here automatically after the phone starts its live preview.");
 			return;
 		}
-		for (const QJsonValue &value : feeds) {
+		for (const QJsonValue value : feeds) {
 			const QJsonObject feed = value.toObject();
 			const QString status = feed.value("status").toString("pairing").toUpper();
 			auto *item = new QTreeWidgetItem(cameras, {feed.value("cameraName").toString("Phone Camera"), status, ""});
@@ -1686,7 +1686,7 @@ QWidget#iwcRoot QTabBar::tab:selected{background:#18242d;color:#fff;border-botto
 		sponsorVisible->setChecked(context.event.value("scoreBugSponsorVisible").toBool(false));
 		sponsor = new QComboBox;
 		sponsor->addItem("NO SPONSOR", "");
-		for (const auto &value : sponsors) {
+		for (const auto value : sponsors) {
 			const QJsonObject asset = value.toObject();
 			sponsor->addItem(asset.value("name").toString(), asset.value("id").toString());
 		}
@@ -1922,7 +1922,7 @@ private:
 		if (!sponsor)
 			return {};
 		const QString id = sponsor->currentData().toString();
-		for (const auto &value : sponsors) {
+		for (const auto value : sponsors) {
 			const QJsonObject asset = value.toObject();
 			if (asset.value("id").toString() == id)
 				return asset.value("url").toString();
@@ -2066,7 +2066,7 @@ private:
 		if (!tree || !tree->currentItem())
 			return {};
 		const QString id = tree->currentItem()->data(0, Qt::UserRole).toString();
-		for (const auto &entry : assets) {
+		for (const auto entry : assets) {
 			const auto asset = entry.toObject();
 			if (asset.value("id").toString() == id)
 				return asset;
@@ -2108,7 +2108,7 @@ private:
 		tree->clear();
 		const QString filter = categoryFilter ? categoryFilter->currentData().toString() : "all";
 		QTreeWidgetItem *reselect = nullptr;
-		for (const auto &entry : assets) {
+		for (const auto entry : assets) {
 			const QJsonObject asset = entry.toObject();
 			if (filter != "all" && asset.value("category").toString() != filter)
 				continue;
@@ -2632,7 +2632,7 @@ private:
 		tree->clear();
 		QHash<QString, QTreeWidgetItem *> parents;
 		QHash<QString, QTreeWidgetItem *> items;
-		for (const auto &entry : result.value("comments").toArray()) {
+		for (const auto entry : result.value("comments").toArray()) {
 			const auto comment = entry.toObject();
 			const QString id = comment.value("id").toString();
 			const QString parentId = comment.value("parentId").toString();
