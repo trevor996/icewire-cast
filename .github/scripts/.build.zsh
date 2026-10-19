@@ -158,6 +158,7 @@ build() {
 
       local -a build_args=(
         ONLY_ACTIVE_ARCH=NO
+        COMPILATION_CACHE_ENABLE_CACHING=NO
         -project obs-studio.xcodeproj
         -target obs-studio
         -destination "generic/platform=macOS,name=Any Mac"
@@ -169,6 +170,7 @@ build() {
 
       local -a archive_args=(
         ONLY_ACTIVE_ARCH=NO
+        COMPILATION_CACHE_ENABLE_CACHING=NO
         -project obs-studio.xcodeproj
         -scheme obs-studio
         -destination "generic/platform=macOS,name=Any Mac"
@@ -188,6 +190,7 @@ build() {
       local -a analyze_args=(
         CLANG_ANALYZER_OUTPUT=sarif
         CLANG_ANALYZER_OUTPUT_DIR=${project_root}/analytics
+        COMPILATION_CACHE_ENABLE_CACHING=NO
         -project obs-studio.xcodeproj
         -target obs-studio
         -destination "generic/platform=macOS,name=Any Mac"

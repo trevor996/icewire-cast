@@ -43,6 +43,13 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Validate release version
+        run: |
+          if [[ ! "${IWC_RELEASE_VERSION}" =~ '^[0-9]+\.[0-9]+\.[0-9]+$' ]]; then
+            print -u2 "Invalid release version: ${IWC_RELEASE_VERSION}"
+            exit 2
+          fi
+
       - name: Select Xcode
         run: sudo xcode-select --switch /Applications/Xcode_26.1.app/Contents/Developer
 
@@ -91,7 +98,11 @@ jobs:
           codesignPass: ${{ secrets.MACOS_NOTARIZATION_PASSWORD }}
 
       - name: Create SHA-256 checksum
-        run: shasum -a 256 build_macos/ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}.dmg > build_macos/ICEWIRE-CAST-${{ inputs.version }}-macos-${{ matrix.artifact }}.dmg.sha256
+        run: |
+          pushd build_macos
+          package="ICEWIRE-CAST-${IWC_RELEASE_VERSION}-macos-${{ matrix.artifact }}.dmg"
+          shasum -a 256 "${package}" > "${package}.sha256"
+          popd
 
       - name: Upload macOS package
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
