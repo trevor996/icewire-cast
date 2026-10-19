@@ -1228,12 +1228,25 @@ OBSDataAutoRelease textSettings(const QString &text, int size, uint32_t color = 
 {
 	OBSDataAutoRelease settings = obs_data_create();
 	OBSDataAutoRelease font = obs_data_create();
+
+#ifdef _WIN32
 	obs_data_set_string(font, "face", "Bahnschrift SemiBold");
+#elif defined(__APPLE__)
+	obs_data_set_string(font, "face", "Helvetica");
+#else
+	obs_data_set_string(font, "face", "Monospace");
+#endif
 	obs_data_set_int(font, "flags", 1);
 	obs_data_set_int(font, "size", size);
 	obs_data_set_obj(settings, "font", font);
 	obs_data_set_string(settings, "text", text.toUtf8().constData());
+
+#ifdef _WIN32
 	obs_data_set_int(settings, "color", color);
+#else
+	obs_data_set_int(settings, "color1", color);
+	obs_data_set_int(settings, "color2", color);
+#endif
 	obs_data_set_bool(settings, "outline", false);
 	return settings;
 }
@@ -1247,7 +1260,12 @@ OBSSourceAutoRelease createOrUpdateText(const char *name, const QString &text, i
 		obs_source_update(source, settings);
 		return source;
 	}
-	return OBSSourceAutoRelease(obs_source_create("text_gdiplus", name, settings, nullptr));
+#ifdef _WIN32
+	constexpr auto textSourceId = "text_gdiplus";
+#else
+	constexpr auto textSourceId = "text_ft2_source";
+#endif
+	return OBSSourceAutoRelease(obs_source_create(textSourceId, name, settings, nullptr));
 }
 
 OBSSourceAutoRelease createOrUpdateColor(const char *name, uint32_t color, int width, int height)
